@@ -58,7 +58,7 @@ export default function ChatInterface({ apiKey }: ChatInterfaceProps) {
 
       // Check for tool_calls directly on message (SDK format)
       if (aiMessage.tool_calls && Array.isArray(aiMessage.tool_calls)) {
-        toolCalls = aiMessage.tool_calls;
+        toolCalls = aiMessage.tool_calls as ToolCall[];
       }
 
       // Extract tool messages (responses) - find ToolMessage type messages

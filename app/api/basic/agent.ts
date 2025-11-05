@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createAgent, tool } from "langchain";
+import { createAgent, tool, type BaseMessage } from "langchain";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { MemorySaver } from "@langchain/langgraph";
 import type { LangGraphRunnableConfig } from "@langchain/langgraph";
@@ -54,9 +54,9 @@ export async function basicAgent(options: { input: Record<string, unknown>; apiK
     systemPrompt: "You are a helpful assistant that can get information about customers.",
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const stream = await agent.stream(options.input as any, {
-    // @ts-expect-error - not yet updated
+  const stream = await agent.stream(options.input as {
+    messages: BaseMessage[];
+  }, {
     encoding: "text/event-stream",
     streamMode: ["values", "updates", "messages"],
     configurable: options.config.configurable,
