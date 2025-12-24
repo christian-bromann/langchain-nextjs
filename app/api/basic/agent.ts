@@ -1,10 +1,17 @@
 import { z } from "zod";
 import { createAgent, tool, type BaseMessage } from "langchain";
-import { ChatAnthropic } from "@langchain/anthropic";
-import { MemorySaver } from "@langchain/langgraph";
 import type { LangGraphRunnableConfig } from "@langchain/langgraph";
+import { ChatOpenAI } from "@langchain/openai";
+import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 
-const checkpointer = new MemorySaver();
+type DB_URI = string | undefined;
+
+const DB_URI: DB_URI = process.env.NEXT_PUBLIC_DB_URI;
+if (!DB_URI) {
+  throw new Error("Missing NEXT_PUBLIC_DB_URI");
+}
+
+const checkpointer = PostgresSaver.fromConnString(DB_URI);
 
 const customers = {
   "1234567890": {
@@ -29,9 +36,12 @@ const customers = {
  */
 export async function basicAgent(options: { input: Record<string, unknown>; apiKey: string; config: LangGraphRunnableConfig }) {
   // Create the Anthropic model instance with user-provided API key
-  const model = new ChatAnthropic({
-    model: "claude-3-7-sonnet-latest",
+  const model = new ChatOpenAI({
+    model: "nvidia/nemotron-3-nano-30b-a3b:free",
     apiKey: options.apiKey,
+    configuration: {
+      baseURL: "https://openrouter.ai/api/v1",
+    },
   });
 
   const getCustomerInformationTool = tool(

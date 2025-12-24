@@ -92,12 +92,18 @@ export function ChatInput({
    */
   useEffect(() => {
     if (textareaRef.current) {
-      // Reset to minimum height to get accurate scrollHeight measurement
-      textareaRef.current.style.height = "52px";
+      // Reset to auto height to get accurate scrollHeight measurement
+      // Using 'auto' prevents the scroll position from resetting to top unlike a fixed small pixel value
+      textareaRef.current.style.height = "auto";
       const scrollHeight = textareaRef.current.scrollHeight;
-      // Cap maximum height at 200px, then allow scrolling
+
+      // Cap maximum height at 200px
       const newHeight = Math.min(scrollHeight, 200);
+
       textareaRef.current.style.height = `${newHeight}px`;
+
+      // Allow scrolling only if content exceeds max height
+      textareaRef.current.style.overflowY = scrollHeight > 200 ? "auto" : "hidden";
 
       // Sync button height to match textarea's actual rendered height
       // This ensures visual alignment even when textarea resizes
